@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Portal - Willy University</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 0; color: #333; }
+        header { background: #00274c; color: #ffcb05; padding: 20px; text-align: center; }
+        .container { max-width: 750px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #00274c; border-bottom: 2px solid #ffcb05; padding-bottom: 8px; }
+        .form-group { margin: 15px 0; text-align: left; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #444; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .btn-submit { background: #28a745; color: white; padding: 12px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; margin-top: 10px; }
+        .btn-submit:hover { background: #218838; }
+        .result-box { background: #eef2f7; padding: 15px; border-radius: 5px; margin-top: 20px; display: none; }
+        .btn-logout { display: inline-block; background: #d9534f; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Willy University of Michigan</h1>
+        <p>Teacher & Lecturer Automated Grading Portal</p>
+    </header>
+    <div class="container">
+        <h2>Ingiza Alama za Somo kwa Mwanafunzi</h2>
+        <form id="gradingForm">
+            <div class="form-group">
+                <label>Jina la Mwanafunzi:</label>
+                <input type="text" id="studentName" placeholder="Mfano: William Mathayo" required>
+            </div>
+            <div class="form-group">
+                <label>Alama ya Mtihani wa Kwanza (Midterm - 40%):</label>
+                <input type="number" id="midterm" placeholder="Weka alama kati ya 0 - 40" max="40" min="0" required>
+            </div>
+            <div class="form-group">
+                <label>Alama ya Mtihani Mkuu (Final Exam - 60%):</label>
+                <input type="number" id="finalExam" placeholder="Weka alama kati ya 0 - 60" max="60" min="0" required>
+            </div>
+            <button type="submit" class="btn-submit">Piga Hesabu na Toa Matokeo</button>
+        </form>
+
+        <div class="result-box" id="resultBox">
+            <h3>Matokeo Yaliyokokotolewa:</h3>
+            <p><strong>Mwanafunzi:</strong> <span id="resName"></span></p>
+            <p><strong>Jumla ya Alama Zote:</strong> <span id="resTotal"></span> / 100</p>
+            <p><strong>Daraja (Grade):</strong> <span id="resGrade"></span></p>
+            <p><strong>Nafasi (Position):</strong> <span id="resPosition">Daraja la Kwanza (Class A)</span></p>
+            <p><strong>Maoni ya Mfumo:</strong> <span id="resRemark"></span></p>
+            <p><strong>chapisha lipoti ya matokeo</strong><span id="resreport"></p>
+ </div>
+
+        <a href="index.html" class="btn-logout">Toka Kwenye Mfumo (Logout)</a>
+    </div>
+
+    <script>
+        document.getElementById('gradingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let name = document.getElementById('studentName').value;
+            let midterm = parseFloat(document.getElementById('midterm').value);
+            let finalExam = parseFloat(document.getElementById('finalExam').value);
+
+            // 1. Jumla ya alama zote
+            let total = midterm + finalExam;
+
+            // 2. Kupanga Daraja na Maoni
+            let grade = '';
+            let remark = '';
+            let position = '';
+
+            if (total >= 75) {
+                grade = 'A (Excellent)';
+                position = 'Wa Kwanza (1st Position)';
+                remark = 'Kazi nzuri sana! Ameonyesha ufaulu wa hali ya juu mno.';
+            } else if (total >= 65) {
+                grade = 'B (Good)';
+                position = 'Wa Pili (2nd Position)';
+                remark = 'Vizuri sana, anafanya vizuri katika masomo yake.';
+            } else if (total >= 50) {
+                grade = 'C (Average)';
+                position = 'Wa Tatu (3rd Position)';
+                remark = 'Amefaulu wastani, anatakiwa kuongeza juhudi zaidi.';
+            } else if (total >= 40) {
+                grade = 'D (Pass)';
+                position = 'Wa Nne (4th Position)';
+                remark = 'Amepita kwa shida, anahitaji usimamizi wa karibu.';
+            } else {
+                grade = 'F (Fail)';
+                position = 'Mwisho';
+                remark = 'Ameliangusha somo, anahitaji kurudia mtihani.';
+            }
+
+            // Kuonyesha majibu kwenye ukurasa
+            document.getElementById('resName').innerText = name;
+            document.getElementById('resTotal').innerText = total;
+            document.getElementById('resGrade').innerText = grade;
+            document.getElementById('resPosition').innerText = position;
+            document.getElementById('resRemark').innerText = remark;
+
+            document.getElementById('resultBox').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
