@@ -3,18 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Portal - WUM</title>
+    <title>Live Email OTP Student Registration - WUM</title>
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init("qYRsHhejVYwssrnB-Y"); // Public Key yako
+        })();
+    </script>
     <style>
         body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
         header { background: #00274c; color: #ffcb05; padding: 20px; text-align: center; border-radius: 8px; }
         h1 { margin: 0; font-size: 24px; }
-        .container { max-width: 600px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .container { max-width: 650px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; color: #00274c; }
-        input { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        .btn { display: block; width: 100%; background: #00274c; color: #ffcb05; padding: 12px; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; }
-        .btn:hover { background: #001f3f; }
-        #result { margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 4px; display: none; }
+        input, select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        .phone-group { display: flex; gap: 10px; }
+        .phone-group select { width: 35%; }
+        .phone-group input { width: 65%; }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; margin-top: 15px; }
+        .checkbox-group input { width: 20px; height: 20px; }
+        .btn-green { display: block; width: 100%; background: #28a745; color: #fff; padding: 14px; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; margin-top: 20px; }
+        .btn-green:hover { background: #218838; }
+        #result, #otpSection { margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 4px; display: none; }
         .back-link { display: inline-block; margin-bottom: 15px; color: #00274c; text-decoration: none; font-weight: bold; }
     </style>
 </head>
@@ -22,78 +34,173 @@
 
     <header>
         <h1>Willy University of Michigan</h1>
-        <p>Student Grading & Registration Portal</p>
+        <p>Live Email OTP Registration Portal</p>
     </header>
 
     <div class="container">
         <a href="index.html" class="back-link">&larr; Rudi Nyumbani</a>
-        <h2>Ingiza Alama za Somo</h2>
+        <h2>Fomu Kamili ya Usajili (Inayotuma Email Halisi)</h2>
         
-        <form id="gradingForm" onsubmit="processData(event)">
+        <form id="regForm" onsubmit="sendRealOTP(event)">
+            
             <div class="form-group">
-                <label>Jina Kamili la Mwanafunzi:</label>
-                <input type="text" id="studentName" required placeholder="Andika jina kamili...">
+                <label>1. Majina Matatu Kamili:</label>
+                <input type="text" id="fullName" required placeholder="Mf. William Mathayo Juma">
             </div>
 
             <div class="form-group">
-                <label>Alama ya Midterm (max 40%):</label>
-                <input type="number" id="midterm" min="0" max="40" required placeholder="Weka 0 - 40">
+                <label>2. Mahali Alipozaliwa (Mkoa / Wilaya / Nchi):</label>
+                <input type="text" id="birthPlace" required placeholder="Mf. Morogoro, Tanzania">
             </div>
 
             <div class="form-group">
-                <label>Alama ya Final (max 60%):</label>
-                <input type="number" id="finalExam" min="0" max="60" required placeholder="Weka 0 - 60">
+                <label>3. Tarehe ya Kuzaliwa:</label>
+                <input type="date" id="dob" required>
             </div>
 
-            <button type="submit" class="btn">Piga Hesabu na Toa Matokeo</button>
+            <div class="form-group">
+                <label>4. Jinsia (Gender):</label>
+                <select id="gender" required>
+                    <option value="">-- Chagua Jinsia --</option>
+                    <option value="Mme">Mme (Male)</option>
+                    <option value="Mke">Mke (Female)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>5. Namba ya Simu ya Mkononi:</label>
+                <div class="phone-group">
+                    <select id="countryCode">
+                        <option value="+255">Tanzania (+255)</option>
+                        <option value="+254">Kenya (+254)</option>
+                        <option value="+256">Uganda (+256)</option>
+                    </select>
+                    <input type="text" id="phoneNumber" required placeholder="712345678 (Bila 0 ya mwanzo)">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>6. Barua Pepe (Email ya Kupokea OTP):</label>
+                <input type="email" id="email" required placeholder="mwanafunzi@wum.edu">
+            </div>
+
+            <div class="form-group">
+                <label>7. Sahihi Yako (Andika jina fupi kama sahihi):</label>
+                <input type="text" id="signature" required placeholder="Mf. W. M. Juma">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms" required>
+                <label for="terms" style="margin-bottom:0; font-weight: normal; font-size: 13px;">Nakubaliana na Sheria, Vigezo na Masharti ya Willy University of Michigan.</label>
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn-green">Wasilisha na Utume Email ya OTP</button>
         </form>
+
+        <div id="otpSection">
+            <h3 style="margin-top:0; color: #00274c;">Uthibitisho wa Barua Pepe (OTP)</h3>
+            <p id="otpMsg" style="font-size: 14px; color: #555;"></p>
+            <div class="form-group">
+                <label>Weka namba za OTP ulizotumiwa kwenye Email yako:</label>
+                <input type="text" id="enteredOtp" placeholder="Weka namba 4 za OTP">
+            </div>
+            <button type="button" class="btn-green" onclick="verifyRealOTP()">Thibitisha OTP na Kamilisha</button>
+        </div>
 
         <div id="result"></div>
     </div>
 
     <script>
-        function processData(event) {
+        let generatedOtp = "";
+        let studentData = {};
+
+        function sendRealOTP(event) {
             event.preventDefault();
-            let name = document.getElementById('studentName').value.trim();
-            let midterm = parseFloat(document.getElementById('midterm').value);
-            let finalExam = parseFloat(document.getElementById('finalExam').value);
 
-            if (name.length < 3 || /\d/.test(name)) {
-                alert("Tafadhali ingiza Jina halisi la mwanafunzi (lisipungue herufi 3 wala kuwa na namba).");
-                return;
-            }
-            if (isNaN(midterm) || midterm < 0 || midterm > 40) {
-                alert("Kosa: Alama ya Midterm lazima iwe kati ya 0 na 40.");
-                return;
-            }
-            if (isNaN(finalExam) || finalExam < 0 || finalExam > 60) {
-                alert("Kosa: Alama ya Final lazima iwe kati ya 0 na 60.");
+            let fullName = document.getElementById('fullName').value.trim();
+            let phone = document.getElementById('phoneNumber').value.trim();
+            let email = document.getElementById('email').value.trim();
+            let btn = document.getElementById('submitBtn');
+
+            if (fullName.split(/\s+/).length < 3 || /\d/.test(fullName)) {
+                alert("Kosa: Tafadhali ingiza Majina matatu halisi bila kuwa na namba.");
                 return;
             }
 
-            let randomNum = Math.floor(100 + Math.random() * 900);
-            let regNumber = "WUM/2026/" + randomNum;
-            let totalScore = midterm + finalExam;
-            let grade = "";
+            if (phone.startsWith('0')) {
+                alert("Kosa: Usianze namba ya simu na sifuri (0).");
+                return;
+            }
 
-            if (totalScore >= 70) grade = "A (Bora Sana)";
-            else if (totalScore >= 60) grade = "B (Vizuri Sana)";
-            else if (totalScore >= 50) grade = "C (Vizuri)";
-            else if (totalScore >= 40) grade = "D (Dhaifu)";
-            else grade = "F (Imelianguka)";
+            // Hifadhi data za mwanafunzi
+            studentData = {
+                fullName: fullName,
+                birthPlace: document.getElementById('birthPlace').value.trim(),
+                dob: document.getElementById('dob').value,
+                gender: document.getElementById('gender').value,
+                phone: document.getElementById('countryCode').value + " " + phone,
+                email: email,
+                signature: document.getElementById('signature').value.trim(),
+                regDate: new Date().toLocaleDateString()
+            };
 
+            // Tengeneza OTP ya tarakimu 4
+            generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+
+            btn.innerText = "Inatuma Email ya OTP... Tafadhali subiri...";
+            btn.disabled = true;
+
+            // Vigezo vya kutuma kupitia EmailJS
+            let templateParams = {
+                to_email: email,
+                to_name: fullName,
+                otp_code: generatedOtp
+            };
+
+            // Kutuma kupitia huduma ya EmailJS
+            emailjs.send('service_opn63sr', 'WILLIAM RICHARD', templateParams)
+                .then(function(response) {
+                    alert("Mafanikio! Email yenye OTP imetumwa kwenda " + email);
+                    document.getElementById('regForm').style.display = "none";
+                    let otpSec = document.getElementById('otpSection');
+                    otpSec.style.display = "block";
+                    document.getElementById('otpMsg').innerHTML = `Ujumbe wenye namba za siri (OTP) umetumwa kwenda kwenye email yako: <strong>${email}</strong>. Angalia kwenye Inbox au Spam yako.`;
+                }, function(error) {
+                    alert("Imeshindikana kutuma email: " + JSON.stringify(error));
+                    btn.innerText = "Wasilisha na Utume Email ya OTP";
+                    btn.disabled = false;
+                });
+        }
+
+        function verifyRealOTP() {
+            let userOtp = document.getElementById('enteredOtp').value.trim();
+
+            if (userOtp !== generatedOtp) {
+                alert("OTP si sahihi! Tafadhali angalia namba uliyotumiwa kwenye email na ujaze kwa usahihi.");
+                return;
+            }
+
+            let randomNum = Math.floor(1000 + Math.random() * 9000);
+            let regNumber = "WUM/2026/REG/" + randomNum;
+
+            document.getElementById('otpSection').style.display = "none";
             let resultDiv = document.getElementById('result');
             resultDiv.style.display = "block";
+            
             resultDiv.innerHTML = `
-                <h3 style="margin-top:0;">Matokeo Yametoka!</h3>
-                <p><strong>Namba ya Usajili (Imetolewa na Mfumo):</strong> ${regNumber}</p>
-                <p><strong>Mwanafunzi:</strong> ${name}</p>
-                <p><strong>Jumla ya Alama:</strong> ${totalScore} / 100</p>
-                <p><strong>Daraja:</strong> ${grade}</p>
+                <h3 style="margin-top:0; color: #28a745;">Usajili Umekamilika na Umethibitishwa!</h3>
+                <p><strong>Namba ya Usajili:</strong> <span style="color: #d9534f; font-size: 16px;">${regNumber}</span></p>
+                <p><strong>Jina Kamili:</strong> ${studentData.fullName}</p>
+                <p><strong>Mahali pa Kuzaliwa:</strong> ${studentData.birthPlace}</p>
+                <p><strong>Tarehe ya Kuzaliwa:</strong> ${studentData.dob}</p>
+                <p><strong>Jinsia:</strong> ${studentData.gender}</p>
+                <p><strong>Namba ya Simu:</strong> ${studentData.phone}</p>
+                <p><strong>Email:</strong> ${studentData.email}</p>
+                <p><strong>Sahihi:</strong> <em>${studentData.signature}</em></p>
+                <p><strong>Tarehe ya Kujiandikisha:</strong> ${studentData.regDate}</p>
+                <p style="color: #00274c; font-weight: bold;">Hifadhi namba yako ya usajili vizuri!</p>
             `;
         }
     </script>
-
 </body>
 </html>
-
