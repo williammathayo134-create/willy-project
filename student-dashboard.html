@@ -4,15 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WUM - Student Registration Portal</title>
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="text/javascript">
-        (function() {
-            emailjs.init("qYRsHhejVYwssrnB-Y");
-        })();
-    </script>
     <style>
-        /* Nakshi Nakshi: Mandhari inayobadilika rangi na kucheza (Animated Gradient) */
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -98,7 +90,6 @@
         }
         .checkbox-group input { width: 20px; height: 20px; accent-color: #28a745; cursor: pointer; }
 
-        /* Nakshi Nakshi: Kitufe kinachonawiri (Glow & Pulse) */
         @keyframes pulseGlow {
             0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.5); }
             70% { box-shadow: 0 0 0 12px rgba(40, 167, 69, 0); }
@@ -167,7 +158,7 @@
         <a href="index.html" class="back-link">&larr; Rudi Nyumbani</a>
         <h2 style="color: #00274c; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;">Fomu Kamili ya Usajili</h2>
         
-        <form id="regForm" onsubmit="sendRealOTP(event)">
+        <form id="regForm" onsubmit="generateAndShowOTP(event)">
             
             <div class="form-group">
                 <label>1. Majina Matatu Kamili:</label>
@@ -206,7 +197,7 @@
             </div>
 
             <div class="form-group">
-                <label>6. Barua Pepe (Email ya Kupokea OTP):</label>
+                <label>6. Barua Pepe (Email):</label>
                 <input type="email" id="email" required placeholder="mwanafunzi@wum.edu">
             </div>
 
@@ -220,17 +211,17 @@
                 <label for="terms" style="margin-bottom:0; font-weight: normal; font-size: 13px; color: #444;">Nakubaliana na Sheria, Vigezo na Masharti ya Willy University of Michigan.</label>
             </div>
 
-            <button type="submit" id="submitBtn" class="btn-green">Wasilisha na Utume Email ya OTP</button>
+            <button type="submit" id="submitBtn" class="btn-green">Wasilisha na Pata OTP</button>
         </form>
 
         <div id="otpSection">
             <h3 style="margin-top:0; color: #00274c;">Uthibitisho wa Barua Pepe (OTP)</h3>
-            <p id="otpMsg" style="font-size: 14px; color: #555;"></p>
+            <p id="otpMsg" style="font-size: 14px; color: #555; background: #fff3cd; padding: 10px; border-radius: 5px; border: 1px solid #ffeeba;"></p>
             <div class="form-group">
-                <label>Weka namba za OTP ulizotumiwa kwenye Email yako:</label>
+                <label>Weka namba za OTP ulizopewa hapo juu:</label>
                 <input type="text" id="enteredOtp" placeholder="Weka namba 4 za OTP">
             </div>
-            <button type="button" class="btn-green" onclick="verifyRealOTP()">Thibitisha OTP na Kamilisha</button>
+            <button type="button" class="btn-green" onclick="verifyOTP()">Thibitisha OTP na Kamilisha</button>
         </div>
 
         <div id="result"></div>
@@ -240,13 +231,12 @@
         let generatedOtp = "";
         let studentData = {};
 
-        function sendRealOTP(event) {
+        function generateAndShowOTP(event) {
             event.preventDefault();
 
             let fullName = document.getElementById('fullName').value.trim();
             let phone = document.getElementById('phoneNumber').value.trim();
             let email = document.getElementById('email').value.trim();
-            let btn = document.getElementById('submitBtn');
 
             if (fullName.split(/\s+/).length < 3 || /\d/.test(fullName)) {
                 alert("Kosa: Tafadhali ingiza Majina matatu halisi bila kuwa na namba.");
@@ -269,36 +259,22 @@
                 regDate: new Date().toLocaleDateString()
             };
 
+            // Tengeneza OTP ya tarakimu 4 papo hapo
             generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
 
-            btn.innerText = "Inatuma Email ya OTP... Subiri kidogo...";
-            btn.disabled = true;
-
-            let templateParams = {
-                to_email: email,
-                to_name: fullName,
-                otp_code: generatedOtp
-            };
-
-            emailjs.send('service_opn63sr', 'WILLIAM RICHARD', templateParams)
-                .then(function(response) {
-                    alert("Mafanikio! Email yenye OTP imetumwa kwenda " + email);
-                    document.getElementById('regForm').style.display = "none";
-                    let otpSec = document.getElementById('otpSection');
-                    otpSec.style.display = "block";
-                    document.getElementById('otpMsg').innerHTML = `Ujumbe wenye namba za siri (OTP) umetumwa kwenda kwenye email yako: <strong>${email}</strong>. Angalia kwenye Inbox au Spam yako.`;
-                }, function(error) {
-                    alert("Imeshindikana kutuma email: " + JSON.stringify(error));
-                    btn.innerText = "Wasilisha na Utume Email ya OTP";
-                    btn.disabled = false;
-                });
+            document.getElementById('regForm').style.display = "none";
+            let otpSec = document.getElementById('otpSection');
+            otpSec.style.display = "block";
+            
+            // Onyesha OTP moja kwa moja kwenye ujumbe ili isikwame kamwe
+            document.getElementById('otpMsg').innerHTML = `Namba yako ya siri ya OTP kwa ajili ya <strong>${email}</strong> ni: <span style="font-size: 20px; color: #d9534f; font-weight: bold;">${generatedOtp}</span> (Iweke hapa chini ili kukamilisha usajili).`;
         }
 
-        function verifyRealOTP() {
+        function verifyOTP() {
             let userOtp = document.getElementById('enteredOtp').value.trim();
 
             if (userOtp !== generatedOtp) {
-                alert("OTP si sahihi! Tafadhali angalia namba uliyotumiwa kwenye email na ujaze kwa usahihi.");
+                alert("OTP si sahihi! Tafadhali angalia namba uliyopewa hapo juu na ujaze kwa usahihi.");
                 return;
             }
 
@@ -326,4 +302,3 @@
     </script>
 </body>
 </html>
-
