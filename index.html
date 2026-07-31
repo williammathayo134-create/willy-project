@@ -22,9 +22,56 @@
     </header>
     <div class="container">
         <h2>Chagua Huduma</h2>
-        <a href="student-login.html" class="btn">Ingia Kama Mwanafunzi (Student Login)</a>
-        <a href="student-dashboard.html" class="btn" style="background: #28a745; color: white;">Dashibodi ya Mwanafunzi</a>
-        <a href="teacher-dashboard.html" class="btn" style="background: #17a2b8; color: white;">Ingia Kama Mwalimu (Teacher Portal)</a>
+           <script>
+        function processData(event) {
+            event.preventDefault();
+
+            let name = document.getElementById('studentName').value.trim();
+            let midterm = parseFloat(document.getElementById('midterm').value);
+            let finalExam = parseFloat(document.getElementById('finalExam').value);
+
+            // Kinga dhidi ya taarifa za uongo (kama jina lina namba au ni fupi sana)
+            if (name.length < 3 || /\d/.test(name)) {
+                alert("Tafadhali ingiza Jina halisi la mwanafunzi (lisipungue herufi 3 wala kuwa na namba).");
+                return;
+            }
+
+            // Kuhakikisha alama za Midterm ziko sahihi (0 hadi 40)
+            if (isNaN(midterm) || midterm < 0 || midterm > 40) {
+                alert("Kosa: Alama ya Midterm lazima iwe kati ya 0 na 40.");
+                return;
+            }
+
+            // Kuhakikisha alama za Final ziko sahihi (0 hadi 60)
+            if (isNaN(finalExam) || finalExam < 0 || finalExam > 60) {
+                alert("Kosa: Alama ya Final lazima iwe kati ya 0 na 60.");
+                return;
+            }
+
+            // Mfumo unajizalishia Namba ya Usajili peke yake
+            let randomNum = Math.floor(100 + Math.random() * 900);
+            let regNumber = "WUM/2026/" + randomNum;
+
+            let totalScore = midterm + finalExam;
+            let grade = "";
+
+            if (totalScore >= 70) grade = "A (Bora Sana)";
+            else if (totalScore >= 60) grade = "B (Vizuri Sana)";
+            else if (totalScore >= 50) grade = "C (Vizuri)";
+            else if (totalScore >= 40) grade = "D (Dhaifu)";
+            else grade = "F (Imelianguka)";
+
+            let resultDiv = document.getElementById('result');
+            resultDiv.style.display = "block";
+            resultDiv.innerHTML = `
+                <h3>Matokeo Yametoka!</h3>
+                <p><strong>Namba ya Usajili (Imetolewa na Mfumo):</strong> ${regNumber}</p>
+                <p><strong>Mwanafunzi:</strong> ${name}</p>
+                <p><strong>Jumla ya Alama:</strong> ${totalScore} / 100</p>
+                <p><strong>Daraja:</strong> ${grade}</p>
+            `;
+        }
+    </script>
 
  </div>
 </body>
