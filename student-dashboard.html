@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Email OTP Student Registration - WUM</title>
+    <title>WUM - Student Registration Portal</title>
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
@@ -12,34 +12,160 @@
         })();
     </script>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
-        header { background: #00274c; color: #ffcb05; padding: 20px; text-align: center; border-radius: 8px; }
-        h1 { margin: 0; font-size: 24px; }
-        .container { max-width: 650px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #00274c; }
-        input, select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        /* Nakshi Nakshi: Mandhari inayobadilika rangi na kucheza (Animated Gradient) */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, #00274c, #0056b3, #1e3c72, #2a5298);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        header {
+            background: rgba(0, 39, 76, 0.9);
+            color: #ffcb05;
+            padding: 25px;
+            text-align: center;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border-bottom: 4px solid #ffcb05;
+            backdrop-filter: blur(5px);
+        }
+
+        h1 { margin: 0; font-size: 26px; text-transform: uppercase; letter-spacing: 1px; }
+        header p { margin: 5px 0 0 0; font-size: 14px; color: #f0f0f0; }
+
+        .container {
+            max-width: 650px;
+            margin: 25px auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .form-group { margin-bottom: 18px; }
+        
+        label { 
+            display: block; 
+            margin-bottom: 6px; 
+            font-weight: bold; 
+            color: #00274c; 
+            font-size: 14px;
+        }
+
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            box-sizing: border-box; 
+            border: 2px solid #e1e1e1; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        input:focus, select:focus {
+            border-color: #0056b3;
+            background: #fff;
+            box-shadow: 0 0 8px rgba(0, 86, 179, 0.3);
+            outline: none;
+        }
+
         .phone-group { display: flex; gap: 10px; }
-        .phone-group select { width: 35%; }
-        .phone-group input { width: 65%; }
-        .checkbox-group { display: flex; align-items: center; gap: 10px; margin-top: 15px; }
-        .checkbox-group input { width: 20px; height: 20px; }
-        .btn-green { display: block; width: 100%; background: #28a745; color: #fff; padding: 14px; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; margin-top: 20px; }
-        .btn-green:hover { background: #218838; }
-        #result, #otpSection { margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 4px; display: none; }
-        .back-link { display: inline-block; margin-bottom: 15px; color: #00274c; text-decoration: none; font-weight: bold; }
+        .phone-group select { width: 38%; }
+        .phone-group input { width: 62%; }
+
+        .checkbox-group { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            margin-top: 20px; 
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .checkbox-group input { width: 20px; height: 20px; accent-color: #28a745; cursor: pointer; }
+
+        /* Nakshi Nakshi: Kitufe kinachonawiri (Glow & Pulse) */
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.5); }
+            70% { box-shadow: 0 0 0 12px rgba(40, 167, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+
+        .btn-green { 
+            display: block; 
+            width: 100%; 
+            background: linear-gradient(135deg, #28a745, #218838); 
+            color: #fff; 
+            padding: 15px; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-align: center; 
+            margin-top: 25px; 
+            transition: all 0.3s ease;
+            animation: pulseGlow 2s infinite;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-green:hover { 
+            background: linear-gradient(135deg, #218838, #1e7e34); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        #result, #otpSection { 
+            margin-top: 20px; 
+            padding: 20px; 
+            background: #f8f9fa; 
+            border-radius: 10px; 
+            border-left: 5px solid #28a745;
+            display: none; 
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .back-link { 
+            display: inline-block; 
+            margin-bottom: 15px; 
+            color: #00274c; 
+            text-decoration: none; 
+            font-weight: bold; 
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: #0056b3; text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <header>
         <h1>Willy University of Michigan</h1>
-        <p>Live Email OTP Registration Portal</p>
+        <p>✨ Portal Rasmi ya Usajili wa Wanafunzi ✨</p>
     </header>
 
     <div class="container">
         <a href="index.html" class="back-link">&larr; Rudi Nyumbani</a>
-        <h2>Fomu Kamili ya Usajili (Inayotuma Email Halisi)</h2>
+        <h2 style="color: #00274c; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;">Fomu Kamili ya Usajili</h2>
         
         <form id="regForm" onsubmit="sendRealOTP(event)">
             
@@ -91,7 +217,7 @@
 
             <div class="checkbox-group">
                 <input type="checkbox" id="terms" required>
-                <label for="terms" style="margin-bottom:0; font-weight: normal; font-size: 13px;">Nakubaliana na Sheria, Vigezo na Masharti ya Willy University of Michigan.</label>
+                <label for="terms" style="margin-bottom:0; font-weight: normal; font-size: 13px; color: #444;">Nakubaliana na Sheria, Vigezo na Masharti ya Willy University of Michigan.</label>
             </div>
 
             <button type="submit" id="submitBtn" class="btn-green">Wasilisha na Utume Email ya OTP</button>
@@ -145,7 +271,7 @@
 
             generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
 
-            btn.innerText = "Inatuma Email ya OTP... Tafadhali subiri...";
+            btn.innerText = "Inatuma Email ya OTP... Subiri kidogo...";
             btn.disabled = true;
 
             let templateParams = {
@@ -185,7 +311,7 @@
             
             resultDiv.innerHTML = `
                 <h3 style="margin-top:0; color: #28a745;">Usajili Umekamilika na Umethibitishwa!</h3>
-                <p><strong>Namba ya Usajili:</strong> <span style="color: #d9534f; font-size: 16px;">${regNumber}</span></p>
+                <p><strong>Namba ya Usajili:</strong> <span style="color: #d9534f; font-size: 16px; font-weight: bold;">${regNumber}</span></p>
                 <p><strong>Jina Kamili:</strong> ${studentData.fullName}</p>
                 <p><strong>Mahali pa Kuzaliwa:</strong> ${studentData.birthPlace}</p>
                 <p><strong>Tarehe ya Kuzaliwa:</strong> ${studentData.dob}</p>
@@ -194,7 +320,7 @@
                 <p><strong>Email:</strong> ${studentData.email}</p>
                 <p><strong>Sahihi:</strong> <em>${studentData.signature}</em></p>
                 <p><strong>Tarehe ya Kujiandikisha:</strong> ${studentData.regDate}</p>
-                <p style="color: #00274c; font-weight: bold;">Hifadhi namba yako ya usajili vizuri!</p>
+                <p style="color: #00274c; font-weight: bold; margin-top: 15px;">Hifadhi namba yako ya usajili vizuri!</p>
             `;
         }
     </script>
