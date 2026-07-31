@@ -8,8 +8,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
         (function() {
-          emailjs.init("qYRsHhejVYwssmB-Y");
- ; // Public Key yako
+            emailjs.init("qYRsHhejVYwssrnB-Y");
         })();
     </script>
     <style>
@@ -133,7 +132,6 @@
                 return;
             }
 
-            // Hifadhi data za mwanafunzi
             studentData = {
                 fullName: fullName,
                 birthPlace: document.getElementById('birthPlace').value.trim(),
@@ -145,20 +143,17 @@
                 regDate: new Date().toLocaleDateString()
             };
 
-            // Tengeneza OTP ya tarakimu 4
             generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
 
             btn.innerText = "Inatuma Email ya OTP... Tafadhali subiri...";
             btn.disabled = true;
 
-            // Vigezo vya kutuma kupitia EmailJS
             let templateParams = {
                 to_email: email,
                 to_name: fullName,
                 otp_code: generatedOtp
             };
 
-            // Kutuma kupitia huduma ya EmailJS
             emailjs.send('service_opn63sr', 'WILLIAM RICHARD', templateParams)
                 .then(function(response) {
                     alert("Mafanikio! Email yenye OTP imetumwa kwenda " + email);
@@ -205,3 +200,4 @@
     </script>
 </body>
 </html>
+
