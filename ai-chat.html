@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Williams Auto Electric Engineer - AI Assistant</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { 
+            background: linear-gradient(-45deg, #0f172a, #1e293b, #090d16, #111827); 
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+            color: #f8fafc; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
+            padding: 15px;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        header { 
+            background: rgba(30, 41, 59, 0.9); 
+            padding: 15px; 
+            text-align: center; 
+            border-radius: 12px; 
+            border-bottom: 3px solid #3b82f6; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            margin-bottom: 15px;
+        }
+        header h1 { font-size: 1.3rem; color: #60a5fa; margin-bottom: 4px; }
+        header p { font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; }
+        
+        .back-link { 
+            display: inline-block; 
+            margin-bottom: 10px; 
+            color: #60a5fa; 
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 0.9rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        .container { flex: 1; max-width: 700px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; }
+        
+        .chat-box { 
+            flex: 1; 
+            background: rgba(30, 41, 59, 0.85); 
+            border-radius: 12px; 
+            padding: 15px; 
+            overflow-y: auto; 
+            margin-bottom: 15px; 
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.4); 
+            min-height: 320px; 
+            max-height: 480px; 
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .message { margin-bottom: 15px; padding: 12px 14px; border-radius: 10px; line-height: 1.5; max-width: 88%; word-wrap: break-word; font-size: 0.95rem; }
+        .user-message { background: #3b82f6; color: white; margin-left: auto; border-bottom-right-radius: 2px; box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3); }
+        .ai-message { background: #334155; color: #e2e8f0; margin-right: auto; border-bottom-left-radius: 2px; border-left: 4px solid #3b82f6; box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+        
+        .input-area { display: flex; gap: 8px; background: rgba(30, 41, 59, 0.9); padding: 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
+        input[type="text"] { flex: 1; background: #0f172a; border: 1px solid #475569; color: white; padding: 12px; border-radius: 8px; font-size: 0.95rem; outline: none; }
+        input[type="text"]:focus { border-color: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,0.3); }
+        
+        button { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: transform 0.2s; }
+        button:hover { transform: scale(1.03); }
+        .loading { font-style: italic; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">&larr; Rudi Kwenye Menyu Kuu</a>
+        <header>
+            <h1>Williams Auto Electric Engineer</h1>
+            <p>Mtaalamu wako wa AI wa Umeme wa Magari na Elimu</p>
+        </header>
+        
+        <div class="chat-box" id="chatBox">
+            <div class="message ai-message">Habari mkuu! Mimi ni AI yako maalum. Niulize swali lolote kuhusu ufundi wa umeme wa magari au masuala ya kitaaluma, nitakusaidia moja kwa moja!</div>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Andika swali lako hapa..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendLocalMessage()">Tuma</button>
+        </div>
+    </div>
+
+    <script>
+        function handleKeyPress(e) { if (e.key === 'Enter') sendLocalMessage(); }
+
+        function sendLocalMessage() {
+            const input = document.getElementById('userInput');
+            const chatBox = document.getElementById('chatBox');
+            const text = input.value.trim();
+            if(!text) return;
+            
+            // Weka ujumbe wa mtumiaji
+            chatBox.innerHTML += `<div class="message user-message">${text}</div>`;
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            const loadingId = 'loading-' + Date.now();
+            chatBox.innerHTML += `<div class="message ai-message loading" id="${loadingId}">AI inatafakari na kuchakata jibu...</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Majibu ya kiakili ya kujitegemea ndani ya app (Standalone simulation ya ufundi wa magari na chuo)
+            setTimeout(() => {
+                document.getElementById(loadingId).remove();
+                let reply = getSmartAIResponse(text);
+                chatBox.innerHTML += `<div class="message ai-message">${reply}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 1000);
+        }
+
+        function getSmartAIResponse(query) {
+            let q = query.toLowerCase();
+            if (q.includes('battery') || q.includes('betri')) {
+                return "Betri ya gari ya 12V inapotakiwa kuchajiwa au ina tatizo la alternator, mara nyingi taa ya dashboard ya betri huwaka au gari linashindwa kuwaka (cranking slow). Hakikisha unakagua terminali kwa kutu.";
+            } else if (q.includes('starter') || q.includes('stata')) {
+                return "Kama starter inagonga 'tick tick' lakini haizungushii engine, inaweza kuwa tatizo la betri haina nguvu ya kutosha, ukomo wa makaa (carbon brushes) ya starter, au relay ya starter imekufa.";
+            } else if (q.includes('sensor') || q.includes('sensa')) {
+                return "Sensa za gari kama Crankshaft Position Sensor au Oxygen Sensor zikiharibika husababisha gari kukosa nguvu, matumizi makubwa ya mafuta, au engine kuzima ghafla wakati wa kwenda.";
+            } else if (q.includes('wum') || q.includes('chuo') || q.includes('usajili')) {
+                return "Willy University of Michigan (WUM) inatoa fursa nzuri za kusoma masuala ya ufundi wa kisasa. Tumia fursa ya fomu yetu ya usajili kupata namba rasmi ya usajili ya WUM!";
+            } else {
+                return `Kuhusu swali lako la <strong>"${query}"</strong>: Kwenye mfumo wa Williams Auto Electric Engineer, tunashauri kukagua mifumo ya nyaya (wiring harness), fuses, na kutumia multimeter kupima voltage kabla ya kufanya ukarabati wowote mkubwa kwenye umeme wa gari.`;
+            }
+        }
+    </script>
+</body>
+</html>
