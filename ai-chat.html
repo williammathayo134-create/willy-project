@@ -818,7 +818,61 @@
                 alert("Kivinjari chako hakitumii sauti.");
             }
         }
+                // Orodha ya Lugha 5 unazozitaka na majina yao
+        const customLanguageList = [
+            { code: 'sw-TZ', name: 'Kiswahili (Tanzania) - Mwanamke (30 Yrs)' },
+            { code: 'sw-KE', name: 'Kiswahili (Kenya) - Mwanaume (27 Yrs)' },
+            { code: 'en-US', name: 'English (US) - Mwanamke (30 Yrs)' },
+            { code: 'en-GB', name: 'English (UK) - Mwanaume (27 Yrs)' },
+            { code: 'fr-FR', name: 'Kifaransa (French) - Mwanamke (30 Yrs)' },
+            { code: 'es-ES', name: 'Kispanyola (Spanish) - Mwanaume (27 Yrs)' },
+            { code: 'ar-SA', name: 'Kiarabu (Arabic) - Mwanamke (30 Yrs)' }
+        ];
 
-     </script>
+        function forceLoadFiveLanguages() {
+            const voiceSelect = document.getElementById('voice-select-custom');
+            if (!voiceSelect) return;
+
+            voiceSelect.innerHTML = ''; // Safisha menu
+
+            // Weka lugha zote 5 kwenye dropdown menu
+            customLanguageList.forEach((langItem, index) => {
+                const opt = document.createElement('option');
+                opt.value = langItem.code;
+                opt.textContent = langItem.name;
+                if (index === 0) opt.selected = true; // Weka Kiswahili kama default
+                voiceSelect.appendChild(opt);
+            });
+        }
+
+        // Ita function hii ukurasa unapofunguka
+        document.addEventListener('DOMContentLoaded', forceLoadFiveLanguages);
+        forceLoadFiveLanguages();
+
+        // Function ya kuongea inayotumia Lugha uliyoichagua kutoka kwenye Lugha 5
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                    return;
+                }
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                const voiceSelect = document.getElementById('voice-select-custom');
+
+                if (voiceSelect && voiceSelect.value) {
+                    // Weka code ya lugha aliyochagua mtumiaji (k.mf. sw-TZ, fr-FR)
+                    utterance.lang = voiceSelect.value;
+                } else {
+                    utterance.lang = 'sw-TZ';
+                }
+
+                utterance.rate = 1.0; 
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Kivinjari chako hakitumii mfumo wa sauti.");
+            }
+        }
+     script>
 </body>
 </html>
