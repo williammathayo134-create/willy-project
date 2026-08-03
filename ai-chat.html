@@ -573,7 +573,7 @@
         }
 
         const responseTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        appendMessageToDOM('ai', aiResponseText, responseTime);
+        streamMessageToDOM('ai', aiResponseText, responseTime);
         saveToHistory('ai', aiResponseText);
 
     } catch (error) {
@@ -637,7 +637,70 @@
                 if (typeof toggleMenu === 'function') toggleMenu(); 
             }
         }
-  
-    </script>
+                // Function ya kutiririsha maneno (Typing Effect) yenye Kitufe cha Sauti
+        function streamMessageToDOM(sender, fullText, time) {
+            const container = document.getElementById('chat-container');
+            if (!container) return;
+            
+            const wrapper = document.createElement('div');
+            const isUser = sender === 'user';
+
+            wrapper.className = `flex items-start space-x-3 animate-fade-in ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+            
+            const cleanText = fullText.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+            wrapper.innerHTML = `
+                <div class="w-8 h-8 rounded-full ${isUser ? 'bg-slate-700' : 'bg-brand-600'} flex items-center justify-center text-white text-xs font-bold">
+                    <i class="fa-solid ${isUser ? 'fa-user' : 'fa-bolt'}"></i>
+                </div>
+                <div class="max-w-[80%] ${isUser ? 'bg-brand-600 text-white' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100'} p-3.5 rounded-2xl text-sm">
+                    <p class="whitespace-pre-wrap typing-text"></p>
+                    <div class="flex items-center justify-between mt-2 pt-1 border-t ${isUser ? 'border-brand-500/40' : 'border-slate-100 dark:border-slate-800'} text-[10px] text-slate-400">
+                        <span>${time}</span>
+                        ${!isUser ? `
+                            <div class="flex items-center space-x-2">
+                                <button onclick="copyText('${cleanText}')" class="hover:text-brand-500" title="Kopi text"><i class="fa-regular fa-copy"></i></button>
+                                <button onclick="speakText('${cleanText}')" class="hover:text-brand-500" title="Sikiliza Sauti"><i class="fa-solid fa-volume-high"></i></button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(wrapper);
+            container.scrollTop = container.scrollHeight;
+
+            const textElement = wrapper.querySelector('.typing-text');
+            let index = 0;
+
+            const interval = setInterval(() => {
+                if (index < fullText.length) {
+                    textElement.textContent += fullText.charAt(index);
+                    index++;
+                    container.scrollTop = container.scrollHeight;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 15);
+        }
+
+        // Function ya Kuongea au Kustopisha sauti pale mtumiaji anapobonyeza kitufe
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                    return;
+                }
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'sw-TZ';
+                utterance.rate = 1.0;
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Kivinjari chako hakitumii mfumo wa sauti (Text-to-Speech).");
+            }
+        }
+     </script>
 </body>
 </html>
