@@ -476,110 +476,109 @@
         }
 
         // 14. KUUNGANISHA HUGGING FACE (IMAGE RECOGNITION) NA GROQ (LLM CHAT)
-        async function sendMessage() {
-            const input = document.getElementById('user-input');
-            const text = input.value.trim();
-            if (!text && !currentAttachment) return;
+    async function sendMessage() {
+    const input = document.getElementById('user-input');
+    const text = input.value.trim();
+    if (!text && !currentAttachment) return;
 
-            let imagePayload = currentAttachment ? currentAttachment.url : null;
-            let currentAttObj = currentAttachment;
+    let imagePayload = currentAttachment ? currentAttachment.url : null;
+    let currentAttObj = currentAttachment;
 
-            // Onyesha ujumbe wa mtumiaji kwenye ukurasa
-            const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            appendMessageToDOM('user', text || "Nimeweka faili/picha hii kwa uchambuzi.", timeNow, currentAttObj);
-            saveToHistory('user', text || "Nimeweka faili/picha hii kwa uchambuzi.", currentAttObj);
+    const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    appendMessageToDOM('user', text || "Nimeweka faili/picha hii kwa uchambuzi.", timeNow, currentAttObj);
+    saveToHistory('user', text || "Nimeweka faili/picha hii kwa uchambuzi.", currentAttObj);
 
-            input.value = '';
-            clearAttachment();
-            
-            // 15. Viashiria vya Kupakia (Typing Indicators / Animation)
-            document.getElementById('typing-indicator').classList.remove('hidden');
+    input.value = '';
+    clearAttachment();
 
-            // Angalia kama mtumiaji yuko nje ya mtandao
-            if (!navigator.onLine) {
-                document.getElementById('typing-indicator').classList.add('hidden');
-                const offlineResp = getOfflineFallbackResponse(text);
-                appendMessageToDOM('ai', offlineResp, timeNow);
-                saveToHistory('ai', offlineResp);
-                return;
+    document.getElementById('typing-indicator').classList.remove('hidden');
+
+    if (!navigator.onLine) {
+        document.getElementById('typing-indicator').classList.add('hidden');
+        const offlineResp = getOfflineFallbackResponse(text);
+        appendMessageToDOM('ai', offlineResp, timeNow);
+        saveToHistory('ai', offlineResp);
+        return;
+    }
+
+    let finalPromptForGroq = text;
+
+    if (imagePayload) {
+        try {
+            const base64Data = imagePayload.split(',')[1];
+            const byteCharacters = atob(base64Data);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
             }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'image/jpeg' });
 
-            let finalPromptForGroq = text;
+            const hfResponse = await fetch("https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large", {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${HF_API_TOKEN}`
+                },
+                body: blob
+            });
 
-            // HATUA YA KWANZA: Kama kuna picha, Hugging Face inaitambua kwanza
-            if (imagePayload) {
-                try {
-                    const base64Data = imagePayload.split(',')[1];
-                    const byteCharacters = atob(base64Data);
-                    const byteNumbers = new Array(byteCharacters.length);
-                    for (let i = 0; i < byteCharacters.length; i++) {
-                        byteNumbers[i] = byteCharacters.charCodeAt(i);
-                    }
-                    const byteArray = new Uint8Array(byteNumbers);
-                    const blob = new Blob([byteArray], { type: 'image/jpeg' });
-
-                    const hfResponse = await fetch("https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large", {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${HF_API_TOKEN}`
-                        },
-                        body: blob
-                    });
-                    
-                    const hfData = await hfResponse.json();
-                    let imageDescription = "";
-                    if (Array.isArray(hfData) && hfData[0]?.generated_text) {
-                        imageDescription = hfData[0].generated_text;
-                    } else if (hfData?.generated_text) {
-                        imageDescription = hfData.generated_text;
-                    }
-
-                    finalPromptForGroq = `[Mtumiaji ameweka picha. Uchambuzi wa picha unaonyesha: "${imageDescription}"]. Ujumbe wa ziada wa William: ${text || "Eleza na fafanua zaidi kuhusu picha hii kulingana na mfumo wa Williams Auto Electric Engineer na ICoT."}`;
-                } catch (err) {
-                    console.error("Hitilafu ya Hugging Face kwenye picha:", err);
-                    finalPromptForGroq = `[Mtumiaji ameweka picha lakini mfumo wa utambuzi umeshindwa kusoma kikamilifu]. Ujumbe: ${text}`;
-                }
-            } else if (currentAttObj && currentAttObj.type === 'file') {
-                finalPromptForGroq = `[Mtumiaji amepakia hati: ${currentAttObj.name}]. Yaliyomo: ${currentAttObj.content.substring(0, 1500)}. Swali/Maelekezo: ${text}`;
+            const hfData = await hfResponse.json();
+            let imageDescription = "";
+            if (Array.isArray(hfData) && hfData[0]?.generated_text) {
+                imageDescription = hfData[0].generated_text;
+                finalPromptForGroq = `[Maelezo ya Picha Iliyopakiwa: ${imageDescription}] ${text}`;
             }
-
-            // HATUA YA PILI: Matokeo yanatumwa kwenda Groq ili yeye ndiye atoe jibu la mwisho la kitaalamu
-            try {
-                const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${GROQ_API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: "llama-3.3-70b-versatile",
-                        messages: [{ role: "user", content: finalPromptForGroq }]
-                    })
-                });
-                
-                const groqData = await groqResponse.json();
-                document.getElementById('typing-indicator').classList.add('hidden');
-
-                let aiResponseText = "";
-                if (groqData.error) {
-                    aiResponseText = "Hitilafu kutoka Groq API: " + (groqData.error.message || "Ufunguo si sahihi");
-                } else if (groqData.choices && groqData.choices[0].message.content) {
-                    aiResponseText = groqData.choices[0].message.content;
-                } else {
-                    aiResponseText = "Samahani, jibu halikupatikana kutoka Groq.";
-                }
-
-                const responseTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                appendMessageToDOM('ai', aiResponseText, responseTime);
-                saveToHistory('ai', aiResponseText);
-
-            } catch (error) {
-                document.getElementById('typing-indicator').classList.add('hidden');
-                const netError = "Hitilafu ya mtandao (Network Error): Angalia muunganisho wako au jaribu tena.";
-                appendMessageToDOM('ai', netError, timeNow);
-                saveToHistory('ai', netError);
-            }
+        } catch (e) {
+            console.error("HF Vision Error:", e);
         }
+    }
+
+    // Inatengeneza historia yote ya mazungumzo badala ya ujumbe mmoja
+    const formattedMessages = chatHistory.map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.text
+    }));
+
+    try {
+        if (!GROQ_API_KEY) {
+            throw new Error("GROQ_API_KEY haijapatikana.");
+        }
+
+        const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${GROQ_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: "llama-3.3-70b-versatile",
+                messages: formattedMessages
+            })
+        });
+        
+        const groqData = await groqResponse.json();
+        document.getElementById('typing-indicator').classList.add('hidden');
+
+        let aiResponseText = "";
+        if (groqData.error) {
+            aiResponseText = "Hitilafu kutoka Groq API: " + (groqData.error.message || "Ufunguo si sahihi");
+        } else if (groqData.choices && groqData.choices[0].message.content) {
+            aiResponseText = groqData.choices[0].message.content;
+        } else {
+            aiResponseText = "Samahani, jibu halikupatikana kutoka Groq.";
+        }
+
+        const responseTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        appendMessageToDOM('ai', aiResponseText, responseTime);
+        saveToHistory('ai', aiResponseText);
+
+    } catch (error) {
+        document.getElementById('typing-indicator').classList.add('hidden');
+        const netError = "Hitilafu: " + error.message;
+        appendMessageToDOM('ai', netError, timeNow);
+        saveToHistory('ai', netError);
+    }
+   }
     </script>
 </body>
 </html>
