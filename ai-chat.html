@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Williams Auto Electric Engineer - AI Portal</title>
+    <title>Williams project  - AI Portal</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -182,7 +182,7 @@
             </div>
 
             <!-- Kitufe Rasmi cha Kutuma (Send Button) -->
-            <button onclick="sendMessage()" class="bg-brand-600 hover:bg-brand-700 text-white w-11 h-11 rounded-2xl flex items-center justify-center shadow-md shadow-brand-500/20 transition shrink-0" title="Tuma Ujumbe">
+            <button onclick="sendMessage()" class="bg-brand-500 hover:bg-brand-700 text-white w-11 h-11 rounded-2xl flex items-center justify-center shadow-md shadow-brand-500/20 transition shrink-0" title="Tuma Ujumbe">
                 <i class="fa-solid fa-paper-plane text-sm"></i>
             </button>
         </div>
@@ -194,13 +194,13 @@
         const GROQ_API_KEY ="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";
         const HF_API_TOKEN ="Hf_yDNYvGjVhoVFVnWLagxVKmrhumeglUWkuV";
 
-        let chatHistory = JSON.parse(localStorage.getItem('willy_auto_chat_history')) || [];
-        let currentAttachment = null; // { type: 'image'/'file', url: '...', name: '...' }
+        let chatHistory = []; 
+        let currentAttachment = null;
         let isListening = false;
 
-        // Anzisha mfumo mzigo unapofunguka
+        // Anzisha mfumo mzigo unapofunguka - Unatengeneza ukurasa msafi na kupakia archives
         window.addEventListener('DOMContentLoaded', () => {
-            loadSavedHistory();
+            renderArchivedSessionsMenu();
             checkOnlineStatus();
             window.addEventListener('online', checkOnlineStatus);
             window.addEventListener('offline', checkOnlineStatus);
@@ -423,21 +423,25 @@
         }
 
         // 13. Kutunza Historia kwenye localStorage (Chat History Storage)
-        function saveToHistory(sender, text, attachment = null) {
-            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            chatHistory.push({ sender, text, time, attachment });
-            localStorage.setItem('willy_auto_chat_history', JSON.stringify(chatHistory));
-        }
+                function saveToHistory(sender, text, attachment = null) {
+            chatHistory.push({ sender, text, attachment, time: new Date().toISOString() });
 
-        function loadSavedHistory() {
-            const container = document.getElementById('chat-container');
-            container.innerHTML = '';
-            chatHistory.forEach(msg => {
-                appendMessageToDOM(msg.sender, msg.text, msg.time, msg.attachment);
-            });
-        }
+            let archives = JSON.parse(localStorage.getItem('willy_chat_archives')) || [];
+            
+            if (archives.length === 0 || archives[0].active !== true) {
+                archives.unshift({
+                    id: Date.now(),
+                    date: new Date().toLocaleString(),
+                    messages: chatHistory,
+                    active: true
+                });
+            } else {
+                archives[0].messages = chatHistory;
+            }
 
-        function appendMessageToDOM(sender, text, time, attachment = null) {
+            localStorage.setItem('willy_chat_archives', JSON.stringify(archives));
+        }
+  function appendMessageToDOM(sender, text, time, attachment = null) {
             const container = document.getElementById('chat-container');
             const wrapper = document.createElement('div');
             const isUser = sender === 'user';
@@ -579,6 +583,61 @@
         saveToHistory('ai', netError);
     }
    }
+              function renderArchivedSessionsMenu() {
+            const dropdownMenu = document.getElementById('dropdown-menu');
+            if (!dropdownMenu) return;
+
+            let archives = JSON.parse(localStorage.getItem('willy_chat_archives')) || [];
+            
+            if (archives.length > 0 && archives[0].active) {
+                archives[0].active = false;
+                localStorage.setItem('willy_chat_archives', JSON.stringify(archives));
+            }
+
+            let historyHtml = `
+                <div class="px-4 py-1.5 text-xs font-semibold text-slate-400 border-t border-slate-100 dark:border-slate-800 mt-1">
+                    Mazungumzo ya Nyuma
+                </div>
+                <div class="max-h-40 overflow-y-auto">
+            `;
+
+            if (archives.length === 0) {
+                historyHtml += `<p class="px-4 py-1 text-xs text-slate-500">Hakuna historia</p>`;
+            } else {
+                archives.forEach((session) => {
+                    const firstMsg = session.messages.find(m => m.sender === 'user')?.text || "Mazungumzo";
+                    const title = firstMsg.length > 18 ? firstMsg.substring(0, 18) + "..." : firstMsg;
+                    
+                    historyHtml += `
+                        <button onclick="loadArchivedSession(${session.id})" class="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs flex justify-between items-center text-slate-700 dark:text-slate-300">
+                            <span class="truncate"><i class="fa-regular fa-message mr-1.5"></i> ${title}</span>
+                            <span class="text-[10px] text-slate-400">${new Date(session.id).toLocaleDateString()}</span>
+                        </button>
+                    `;
+                });
+            }
+
+            historyHtml += `</div>`;
+            dropdownMenu.insertAdjacentHTML('beforeend', historyHtml);
+        }
+
+        function loadArchivedSession(sessionId) {
+            let archives = JSON.parse(localStorage.getItem('willy_chat_archives')) || [];
+            const targetSession = archives.find(s => s.id === sessionId);
+            
+            if (targetSession) {
+                const container = document.getElementById('chat-container') || document.querySelector('main');
+                if (container) container.innerHTML = ''; 
+                chatHistory = targetSession.messages; 
+
+                targetSession.messages.forEach(msg => {
+                    appendMessageToDOM(msg.sender, msg.text, new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), msg.attachment);
+                });
+                
+                if (typeof toggleMenu === 'function') toggleMenu(); 
+            }
+        }
+  
     </script>
 </body>
 </html>
