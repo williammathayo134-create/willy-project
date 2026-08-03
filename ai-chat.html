@@ -52,6 +52,35 @@
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 h-dvh flex flex-col transition-colors duration-300 overflow-hidden">
+        <!-- Kitufe cha Setting Juu Kushoto -->
+        <button onclick="toggleVoiceSettings()" class="p-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition mr-2" title="Mipangilio ya Sauti">
+            <i class="fa-solid fa-gear text-lg"></i>
+        </button>
+
+        <!-- Modal / Kisanduku cha Mipangilio ya Sauti -->
+        <div id="voice-settings-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 w-full max-w-sm shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b pb-2 dark:border-slate-800">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                        <i class="fa-solid fa-gear text-brand-500"></i> Mipangilio ya Sauti
+                    </h3>
+                    <button onclick="toggleVoiceSettings()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs text-slate-500 font-medium">Chagua Sauti ya AI:</label>
+                    <select id="voice-select-custom" class="w-full text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 focus:outline-none">
+                        <option value="">Inapakia sauti...</option>
+                    </select>
+                </div>
+
+                <button onclick="toggleVoiceSettings()" class="w-full bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold py-2 rounded-xl">
+                    Hifadhi na Funga
+                </button>
+            </div>
+        </div>
 
     <!-- HEADER / KICHWA CHA MFUMO -->
     <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between shrink-0 shadow-sm z-20">
@@ -701,6 +730,95 @@
                 alert("Kivinjari chako hakitumii mfumo wa sauti (Text-to-Speech).");
             }
         }
+                // 1. Function ya kufungua/kufunga Modal ya Setting
+        function toggleVoiceSettings() {
+            const modal = document.getElementById('voice-settings-modal');
+            if (modal) {
+                modal.classList.toggle('hidden');
+            }
+        }
+
+        // 2. Orodha ya Lugha 5 Kuu (Kiswahili, Kiingereza, Kifaransa, Kiarabu, Kispanyola)
+        const supportedLangs = ['sw', 'en', 'fr', 'ar', 'es'];
+
+        let systemVoices = [];
+
+        function loadCustomVoiceOptions() {
+            if (!('speechSynthesis' in window)) return;
+
+            systemVoices = window.speechSynthesis.getVoices();
+            const voiceSelect = document.getElementById('voice-select-custom');
+            if (!voiceSelect) return;
+
+            voiceSelect.innerHTML = '';
+
+            // Sauti zilizochujwa kwa lugha 5
+            const filteredVoices = systemVoices.filter(v => 
+                supportedLangs.some(lang => v.lang.toLowerCase().startsWith(lang))
+            );
+
+            if (filteredVoices.length === 0) {
+                // Kama hakuna lugha hizo, pakia sauti zote zilizopo
+                systemVoices.forEach((v, index) => {
+                    const opt = document.createElement('option');
+                    opt.value = index;
+                    opt.textContent = `${v.name} (${v.lang})`;
+                    voiceSelect.appendChild(opt);
+                });
+                return;
+            }
+
+            filteredVoices.forEach((voice) => {
+                const realIndex = systemVoices.indexOf(voice);
+                const opt = document.createElement('option');
+                opt.value = realIndex;
+                
+                // Tambua au weka alama ya Jinsia kulingana na jina la sauti
+                let genderTag = "Mwanamke (30 Yrs)";
+                const nameLower = voice.name.toLowerCase();
+                if (nameLower.includes('male') || nameLower.includes('david') || nameLower.includes('george') || nameLower.includes('guy') || nameLower.includes('stefan')) {
+                    genderTag = "Mwanaume (27 Yrs)";
+                }
+
+                // Onyesha Jinsia na Lugha
+                opt.textContent = `${voice.name} — ${genderTag} [${voice.lang}]`;
+                
+                // Weka Kiswahili au English kama sauti chaguo la kwanza (Default)
+                if (voice.lang.includes('sw') || voice.lang.includes('en')) {
+                    opt.selected = true;
+                }
+
+                voiceSelect.appendChild(opt);
+            });
+        }
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = loadCustomVoiceOptions;
+            loadCustomVoiceOptions();
+        }
+
+        // 3. Function mpya ya speakText inayotumia Setting iliyochaguliwa
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                    return;
+                }
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                const voiceSelect = document.getElementById('voice-select-custom');
+
+                if (voiceSelect && voiceSelect.value !== "" && systemVoices[voiceSelect.value]) {
+                    utterance.voice = systemVoices[voiceSelect.value];
+                }
+
+                utterance.rate = 1.0; 
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Kivinjari chako hakitumii sauti.");
+            }
+        }
+
      </script>
 </body>
 </html>
