@@ -28,7 +28,6 @@ here<!DOCTYPE html>
             width: 100%;
             font-size: 15px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: background 0.2s;
         }
         .btn-google:hover { background: #f8f9fa; }
         .btn-google img { width: 20px; height: 20px; }
@@ -37,7 +36,7 @@ here<!DOCTYPE html>
         .logout-btn { position: absolute; right: 15px; top: 15px; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
     </style>
 
-    <!-- Firebase SDK (Inayoendana na HTML/JS ya Kawaida) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
@@ -49,7 +48,6 @@ here<!DOCTYPE html>
         <button id="logout-btn" onclick="logoutUser()" class="logout-btn hidden">Ondoka</button>
     </header>
 
-    <!-- 1. SEHEMU YA SIGN IN WITH GOOGLE -->
     <div id="auth-container" class="container">
         <h2 style="margin-top:0; color:#00274c;">Ingia Kwenye Mfumo</h2>
         <p style="margin-bottom: 25px;">Bonyeza kitufe hapa chini kuingia kwa akaunti yako ya Google.</p>
@@ -60,7 +58,6 @@ here<!DOCTYPE html>
         </button>
     </div>
 
-    <!-- 2. SEHEMU YA HUDUMA -->
     <div id="services-container" class="container hidden">
         <h2>Chagua Huduma</h2>
         <a href="student-dashboard.html" class="btn">Ingia kama Mwanafunzi (Fomu na Namba ya Usajili)</a>
@@ -70,7 +67,6 @@ here<!DOCTYPE html>
     </div>
 
     <script>
-        // Taarifa Zako Sahihi Za Firebase
         const firebaseConfig = {
           apiKey: "AIzaSyAGs0yCE3Rh_CuRI90aAOZG9VRCOsJL2Io",
           authDomain: "willy-project-a37da.firebaseapp.com",
@@ -81,12 +77,10 @@ here<!DOCTYPE html>
           measurementId: "G-MZHCS9SM8H"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
 
-        // Angalia kama mtumiaji tayari ameingia
         auth.onAuthStateChanged((user) => {
             if (user) {
                 showServices(user);
@@ -97,7 +91,6 @@ here<!DOCTYPE html>
             }
         });
 
-        // Kazi ya Kuingia kwa Google
         function signInWithGoogle() {
             auth.signInWithPopup(provider)
                 .then((result) => {
@@ -108,7 +101,6 @@ here<!DOCTYPE html>
                 });
         }
 
-        // Onyesha huduma
         function showServices(user) {
             document.getElementById('auth-container').classList.add('hidden');
             document.getElementById('services-container').classList.remove('hidden');
@@ -116,13 +108,11 @@ here<!DOCTYPE html>
             document.getElementById('header-subtitle').innerText = `Habari ${user.displayName}, karibu kwenye huduma za chuo!`;
         }
 
-        // Logout
         function logoutUser() {
             auth.signOut().then(() => {
                 location.reload();
             });
         }
     </script>
-
 </body>
 </html>
