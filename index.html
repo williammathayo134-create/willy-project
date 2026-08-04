@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+here<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,29 +6,104 @@
     <title>Willy University of Michigan</title>
     <style>
         body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
-        header { background: #00274c; color: #ffcb05; padding: 20px; text-align: center; border-radius: 8px; }
+        header { background: #00274c; color: #ffcb05; padding: 20px; text-align: center; border-radius: 8px; position: relative; }
         h1 { margin: 0; font-size: 24px; }
-        p { font-size: 12px; color: #555; }
+        p { font-size: 12px; color: #e2e8f0; }
         .container { max-width: 500px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
         .btn { display: block; width: 100%; background: #00274c; color: #ffcb05; padding: 14px; margin: 15px 0; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; text-decoration: none; box-sizing: border-box; }
         .btn:hover { background: #001f3f; }
+        
+        /* Layout ya Form */
+        .form-group { text-align: left; margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: bold; color: #333; margin-bottom: 5px; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+        .btn-submit { background: #2563eb; color: white; border: none; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-submit:hover { background: #1d4ed8; }
+        .hidden { display: none !important; }
+        .logout-btn { position: absolute; right: 15px; top: 15px; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Willy project</h1>
-        <p>Welcome to Excellence and Innovation</p>
+        <h1 id="header-title">Willy project</h1>
+        <p id="header-subtitle">Welcome to Excellence and Innovation</p>
+        <button id="logout-btn" onclick="logoutUser()" class="logout-btn hidden">Ondoka</button>
     </header>
 
-    <div class="container">
+    <!-- 1. FOMU YA USAJILI (Inaonekana kabla ya kuona huduma) -->
+    <div id="auth-container" class="container">
+        <h2 style="margin-top:0; color:#00274c;">Usajili wa Akaunti</h2>
+        <p style="margin-bottom: 20px;">Tafadhali jisajili ili kuendelea na huduma za Willy Project</p>
+        
+        <form onsubmit="handleRegistration(event)">
+            <div class="form-group">
+                <label for="reg-name">Jina Kamili</label>
+                <input type="text" id="reg-name" class="form-input" placeholder="Mfano: William Mathayo" required>
+            </div>
+
+            <div class="form-group">
+                <label for="reg-email">Barua Pepe (Email)</label>
+                <input type="email" id="reg-email" class="form-input" placeholder="mfano@gmail.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="reg-pass">Nambari ya Siri (Password)</label>
+                <input type="password" id="reg-pass" class="form-input" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn btn-submit">Jisajili & Endelea</button>
+        </form>
+    </div>
+
+    <!-- 2. SEHEMU YA HUDUMA (Inajificha hadi mtumiaji ajisajili) -->
+    <div id="services-container" class="container hidden">
         <h2>Chagua Huduma</h2>
         <a href="student-dashboard.html" class="btn">Ingia kama Mwanafunzi (Fomu na Namba ya Usajili)</a>
         <a href="teacher-dashboard.html" class="btn">Ingia kama Mwalimu / Usajili</a>
         <a href="ai-chat.html" style="display: block; background: #2563eb; color: white; padding: 15px; text-align: center; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 15px;">Uliza AI (swali lolote)</a>
-        <a href="chat_bot.html" style= "display: block; background: #256; color: red blue; padding:12px; text-align: center; border-radius: 5px; text-decoration: none; font-weight: bold; margin-top: 12px;">Uiza chatboot (Kwa maswala ya chuo)</a>
- </div>
+        <a href="chat_bot.html" style="display: block; background: #00274c; color: #ffcb05; padding: 12px; text-align: center; border-radius: 5px; text-decoration: none; font-weight: bold; margin-top: 12px;">Uliza chatbot (Kwa maswala ya chuo)</a>
+    </div>
+
+    <script>
+        // Kagua kama mtumiaji tayari yuko kwenye mfumo
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('willy_user_data');
+            if (savedUser) {
+                showServices(JSON.parse(savedUser));
+            }
+        });
+
+        // X-Handle Usajili
+        function handleRegistration(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+
+            const userData = { name: name, email: email };
+            
+            // Hifadhi kwenye browser ya mtumiaji
+            localStorage.setItem('willy_user_data', JSON.stringify(userData));
+
+            // Onyesha sehemu ya huduma
+            showServices(userData);
+        }
+
+        // Onyesha ukurasa wa huduma
+        function showServices(user) {
+            document.getElementById('auth-container').classList.add('hidden');
+            document.getElementById('services-container').classList.remove('hidden');
+            document.getElementById('logout-btn').classList.remove('hidden');
+            document.getElementById('header-subtitle').innerText = `Habari ${user.name}, karibu kwenye huduma za chuo!`;
+        }
+
+        // Ondoka kwenye Akaunti
+        function logoutUser() {
+            localStorage.removeItem('willy_user_data');
+            location.reload();
+        }
+    </script>
 
 </body>
 </html>
-
