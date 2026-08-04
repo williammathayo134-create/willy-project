@@ -30,12 +30,16 @@ here<!DOCTYPE html>
         <button id="logout-btn" onclick="logoutUser()" class="logout-btn hidden">Ondoka</button>
     </header>
 
-    <!-- 1. FOMU YA USAJILI (Inayotuma Data Formspree) -->
+    <!-- 1. FOMU YA USAJILI -->
     <div id="auth-container" class="container">
         <h2 style="margin-top:0; color:#00274c;">Usajili wa Akaunti</h2>
         <p style="margin-bottom: 20px;">Tafadhali jisajili ili kuendelea na huduma za Willy Project</p>
         
-        <form id="registration-form" action="https://formspree.io/f/moeaarqa" method="POST" onsubmit="handleRegistration(event)">
+        <form id="registration-form" onsubmit="handleRegistration(event)">
+            <!-- Access Key Yako Imewekwa Hapa -->
+            <input type="hidden" name="access_key" value="634b1b35-5ce7-4395-8f51-74eebd1a0195">
+            <input type="hidden" name="subject" value="Usajili Mpya - Willy Project">
+
             <div class="form-group">
                 <label for="reg-name">Jina Kamili</label>
                 <input type="text" name="Jina Kamili" id="reg-name" class="form-input" placeholder="Mfano: William Mathayo" required>
@@ -48,7 +52,7 @@ here<!DOCTYPE html>
 
             <div class="form-group">
                 <label for="reg-pass">Nambari ya Siri (Password)</label>
-                <input type="password" name="Password" id="reg-pass" class="form-input" placeholder="••••••••" required>
+                <input type="password" name="User Pass" id="reg-pass" class="form-input" placeholder="••••••••" required>
             </div>
 
             <button type="submit" id="submit-btn" class="btn btn-submit">Jisajili & Endelea</button>
@@ -83,19 +87,22 @@ here<!DOCTYPE html>
             submitBtn.innerText = "Inatuma usajili...";
             submitBtn.disabled = true;
 
+            const formData = new FormData(form);
+
             try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: new FormData(form),
-                    headers: { 'Accept': 'application/json' }
+                const response = await fetch("https://api.web3forms.com/submit", {
+                    method: "POST",
+                    body: formData
                 });
 
-                if (response.ok) {
+                const data = await response.json();
+
+                if (data.success) {
                     const userData = { name: name, email: email };
                     localStorage.setItem('willy_user_data', JSON.stringify(userData));
                     showServices(userData);
                 } else {
-                    alert("Kuna tatizo limetokea. Tafadhali jaribu tena.");
+                    alert("Kuna tatizo: " + data.message);
                     submitBtn.innerText = "Jisajili & Endelea";
                     submitBtn.disabled = false;
                 }
