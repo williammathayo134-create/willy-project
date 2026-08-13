@@ -3,60 +3,337 @@ here<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Login - Willy University</title>
+    <title>WUM - Student Registration Portal</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .login-card { background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        h2 { color: #00274c; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        .btn { width: 100%; background: #00274c; color: #ffcb05; padding: 12px; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
-        .btn:hover { background: #001f3f; }
-        .back-link { display: block; margin-top: 15px; color: #666; text-decoration: none; }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, #00274c, #0056b3, #1e3c72, #2a5298);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        header {
+            background: rgba(0, 39, 76, 0.9);
+            color: #ffcb05;
+            padding: 25px;
+            text-align: center;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border-bottom: 4px solid #ffcb05;
+            backdrop-filter: blur(5px);
+        }
+
+        h1 { margin: 0; font-size: 26px; text-transform: uppercase; letter-spacing: 1px; }
+        header p { margin: 5px 0 0 0; font-size: 14px; color: #f0f0f0; }
+
+        .container {
+            max-width: 650px;
+            margin: 25px auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .form-group { margin-bottom: 18px; }
+        
+        label { 
+            display: block; 
+            margin-bottom: 6px; 
+            font-weight: bold; 
+            color: #00274c; 
+            font-size: 14px;
+        }
+
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            box-sizing: border-box; 
+            border: 2px solid #e1e1e1; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        input:focus, select:focus {
+            border-color: #0056b3;
+            background: #fff;
+            box-shadow: 0 0 8px rgba(0, 86, 179, 0.3);
+            outline: none;
+        }
+
+        .phone-group { display: flex; gap: 10px; }
+        .phone-group select { width: 38%; }
+        .phone-group input { width: 62%; }
+
+        .checkbox-group { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            margin-top: 20px; 
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .checkbox-group input { width: 20px; height: 20px; accent-color: #28a745; cursor: pointer; }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.5); }
+            70% { box-shadow: 0 0 0 12px rgba(40, 167, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+
+        .btn-green { 
+            display: block; 
+            width: 100%; 
+            background: linear-gradient(135deg, #28a745, #218838); 
+            color: #fff; 
+            padding: 15px; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-align: center; 
+            margin-top: 25px; 
+            transition: all 0.3s ease;
+            animation: pulseGlow 2s infinite;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-green:hover { 
+            background: linear-gradient(135deg, #218838, #1e7e34); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        #result, #otpSection { 
+            margin-top: 20px; 
+            padding: 20px; 
+            background: #f8f9fa; 
+            border-radius: 10px; 
+            border-left: 5px solid #28a745;
+            display: none; 
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .back-link { 
+            display: inline-block; 
+            margin-bottom: 15px; 
+            color: #00274c; 
+            text-decoration: none; 
+            font-weight: bold; 
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: #0056b3; text-decoration: underline; }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <h2>Student Registration</h2>
-        <!-- Form sasa inaita handleStudentRegister(event) wakati wa kusubmit -->
-        <form onsubmit="handleStudentRegister(event)">
-            <input type="text" id="fullName" placeholder="Jina Kamili" required>
-            <input type="email" id="email" placeholder="Barua Pepe (Email)" required>
-            <input type="tel" id="phone" placeholder="Namba ya Simu" required>
-            <button type="submit" class="btn">Sajili / Ingia</button>
+
+    <header>
+        <h1>Willy University of Michigan</h1>
+        <p>✨ Portal Rasmi ya Usajili wa Wanafunzi ✨</p>
+    </header>
+
+    <div class="container">
+        <a href="index.html" class="back-link">&larr; Rudi Nyumbani</a>
+        <h2 style="color: #00274c; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;">Fomu Kamili ya Usajili</h2>
+        
+        <form id="regForm" onsubmit="generateAndShowOTP(event)">
+            
+            <div class="form-group">
+                <label>1. Majina Matatu Kamili:</label>
+                <input type="text" id="fullName" required placeholder="Mf. William Mathayo Juma">
+            </div>
+
+            <div class="form-group">
+                <label>2. Mahali Alipozaliwa (Mkoa / Wilaya / Nchi):</label>
+                <input type="text" id="birthPlace" required placeholder="Mf. Morogoro, Tanzania">
+            </div>
+
+            <div class="form-group">
+                <label>3. Tarehe ya Kuzaliwa:</label>
+                <input type="date" id="dob" required>
+            </div>
+
+            <div class="form-group">
+                <label>4. Jinsia (Gender):</label>
+                <select id="gender" required>
+                    <option value="">-- Chagua Jinsia --</option>
+                    <option value="Mme">Mme (Male)</option>
+                    <option value="Mke">Mke (Female)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>5. Namba ya Simu ya Mkononi:</label>
+                <div class="phone-group">
+                    <select id="countryCode">
+                        <option value="+255">Tanzania (+255)</option>
+                        <option value="+254">Kenya (+254)</option>
+                        <option value="+256">Uganda (+256)</option>
+                    </select>
+                    <input type="text" id="phoneNumber" required placeholder="712345678 (Bila 0 ya mwanzo)">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>6. Barua Pepe (Email):</label>
+                <input type="email" id="email" required placeholder="mwanafunzi@wum.edu">
+            </div>
+
+            <div class="form-group">
+                <label>7. Sahihi Yako (Andika jina fupi kama sahihi):</label>
+                <input type="text" id="signature" required placeholder="Mf. W. M. Juma">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms" required>
+                <label for="terms" style="margin-bottom:0; font-weight: normal; font-size: 13px; color: #444;">Nakubaliana na Sheria, Vigezo na Masharti ya Willy University of Michigan.</label>
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn-green">Wasilisha na Pata OTP</button>
         </form>
-        <a href="index.html" class="back-link">Rudi Nyuma</a>
+
+        <div id="otpSection">
+            <h3 style="margin-top:0; color: #00274c;">Uthibitisho wa Barua Pepe (OTP)</h3>
+            <p id="otpMsg" style="font-size: 14px; color: #555; background: #fff3cd; padding: 10px; border-radius: 5px; border: 1px solid #ffeeba;"></p>
+            <div class="form-group">
+                <label>Weka namba za OTP ulizopewa hapo juu:</label>
+                <input type="text" id="enteredOtp" placeholder="Weka namba 4 za OTP">
+            </div>
+            <button type="button" class="btn-green" id="verifyBtn" onclick="verifyOTP()">Thibitisha OTP na Kamilisha</button>
+        </div>
+
+        <div id="result"></div>
     </div>
 
-    <!-- 1. Maktaba ya Supabase -->
+    <!-- 1. Supabase JS CDN Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
-      // 2. Anzisha Supabase Client
-      const SUPABASE_URL = 'https://yeknndybcythktjhqg.supabase.co';
-      const SUPABASE_KEY = 'sb_publishable_DIRrZcp4bUVnRXmovQnksg_j74R0JWI';
-      const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // 2. Supabase Setup
+        const SUPABASE_URL = 'https://yeknndybcythktjhqg.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_DIRrZcp4bUVnRXmovQnksg_j74R0JWI';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      // 3. Function ya kusajili mwanafunzi mpya
-      async function handleStudentRegister(event) {
-        event.preventDefault(); // Kuzuia ukurasa kurefresh
+        let generatedOtp = "";
+        let studentData = {};
 
-        const fullName = document.getElementById('fullName').value;
-        const email = document.getElementById('email').value;
-        const phone = document.getElementById('phone').value;
+        function generateAndShowOTP(event) {
+            event.preventDefault();
 
-        const { data, error } = await _supabase
-          .from('students')
-          .insert([
-            { full_name: fullName, email: email, phone: phone }
-          ]);
+            let fullName = document.getElementById('fullName').value.trim();
+            let phone = document.getElementById('phoneNumber').value.trim();
+            let email = document.getElementById('email').value.trim();
 
-        if (error) {
-          alert("Imeshindikana kuhifadhi: " + error.message);
-        } else {
-          alert("Mwanafunzi amesajiliwa kikamilifu!");
-          window.location.href = "student-dashboard.html"; // Mpeleke kwenye dashboard
+            if (fullName.split(/\s+/).length < 3 || /\d/.test(fullName)) {
+                alert("Kosa: Tafadhali ingiza Majina matatu halisi bila kuwa na namba.");
+                return;
+            }
+
+            if (phone.startsWith('0')) {
+                alert("Kosa: Usianze namba ya simu na sifuri (0).");
+                return;
+            }
+
+            studentData = {
+                fullName: fullName,
+                birthPlace: document.getElementById('birthPlace').value.trim(),
+                dob: document.getElementById('dob').value,
+                gender: document.getElementById('gender').value,
+                phone: document.getElementById('countryCode').value + " " + phone,
+                email: email,
+                signature: document.getElementById('signature').value.trim(),
+                regDate: new Date().toLocaleDateString()
+            };
+
+            generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+
+            document.getElementById('regForm').style.display = "none";
+            let otpSec = document.getElementById('otpSection');
+            otpSec.style.display = "block";
+            
+            document.getElementById('otpMsg').innerHTML = `Namba yako ya siri ya OTP kwa ajili ya <strong>${email}</strong> ni: <span style="font-size: 20px; color: #d9534f; font-weight: bold;">${generatedOtp}</span> (Iweke hapa chini ili kukamilisha usajili).`;
         }
-      }
+
+        async function verifyOTP() {
+            let userOtp = document.getElementById('enteredOtp').value.trim();
+
+            if (userOtp !== generatedOtp) {
+                alert("OTP si sahihi! Tafadhali angalia namba uliyopewa hapo juu na ujaze kwa usahihi.");
+                return;
+            }
+
+            let verifyBtn = document.getElementById('verifyBtn');
+            verifyBtn.disabled = true;
+            verifyBtn.innerText = "Inahifadhi data...";
+
+            try {
+                // Tuma data Supabase
+                const { data, error } = await _supabase
+                    .from('students')
+                    .insert([
+                        { 
+                            full_name: studentData.fullName, 
+                            email: studentData.email, 
+                            phone: studentData.phone 
+                        }
+                    ]);
+
+                if (error) {
+                    alert("Supabase Error: " + error.message + "\n\nHakikisha jedwali 'students' lina column za 'full_name', 'email', na 'phone'.");
+                    verifyBtn.disabled = false;
+                    verifyBtn.innerText = "Thibitisha OTP na Kamilisha";
+                    return;
+                }
+
+                let randomNum = Math.floor(1000 + Math.random() * 9000);
+                let regNumber = "WUM/2026/REG/" + randomNum;
+
+                document.getElementById('otpSection').style.display = "none";
+                let resultDiv = document.getElementById('result');
+                resultDiv.style.display = "block";
+                
+                resultDiv.innerHTML = `
+                    <h3 style="margin-top:0; color: #28a745;">Usajili Umekamilika na Umethibitishwa!</h3>
+                    <p><strong>Namba ya Usajili:</strong> <span style="color: #d9534f; font-size: 16px; font-weight: bold;">${regNumber}</span></p>
+                    <p><strong>Jina Kamili:</strong> ${studentData.fullName}</p>
+                    <p><strong>Mahali pa Kuzaliwa:</strong> ${studentData.birthPlace}</p>
+                    <p><strong>Tarehe ya Kuzaliwa:</strong> ${studentData.dob}</p>
+                    <p><strong>Jinsia:</strong> ${studentData.gender}</p>
+                    <p><strong>Namba ya Simu:</strong> ${studentData.phone}</p>
+                    <p><strong>Email:</strong> ${studentData.email}</p>
+                    <p><strong>Sahihi:</strong> <em>${studentData.signature}</em></p>
+                    <p><strong>Tarehe ya Kujiandikisha:</strong> ${studentData.regDate}</p>
+                    <p style="color: #00274c; font-weight: bold; margin-top: 15px;">Hifadhi namba yako ya usajili vizuri!</p>
+                    <a href="student-dashboard.html" class="btn-green" style="text-decoration: none; display: inline-block; width: auto; padding: 10px 20px; margin-top: 10px;">Nenda Dashboard</a>
+                `;
+            } catch (err) {
+                alert("Network Error: " + err.message);
+                verifyBtn.disabled = false;
+                verifyBtn.innerText = "Thibitisha OTP na Kamilisha";
+            }
+        }
     </script>
 </body>
 </html>
