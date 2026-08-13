@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+here<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -283,8 +283,8 @@
             verifyBtn.disabled = true;
             verifyBtn.innerText = "Inahifadhi data...";
 
-            // Kutuma Data moja kwa moja bila kutegemea CDN/Library
             try {
+                // Tuma data moja kwa moja kwa REST API
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/students`, {
                     method: 'POST',
                     headers: {
@@ -301,8 +301,14 @@
                 });
 
                 if (!response.ok) {
-                    const errData = await response.json();
-                    alert("Supabase Error: " + (errData.message || response.statusText));
+                    let errMessage = "Kosa katika kutuma data.";
+                    try {
+                        const errData = await response.json();
+                        errMessage = errData.message || JSON.stringify(errData);
+                    } catch(e) {
+                        errMessage = response.statusText;
+                    }
+                    alert("Supabase Response Error: " + errMessage);
                     verifyBtn.disabled = false;
                     verifyBtn.innerText = "Thibitisha OTP na Kamilisha";
                     return;
@@ -331,7 +337,7 @@
                 `;
 
             } catch (err) {
-                alert("Kosa la Mtandao: " + err.message);
+                alert("Network Error (Check Connection / URL): " + err.message);
                 verifyBtn.disabled = false;
                 verifyBtn.innerText = "Thibitisha OTP na Kamilisha";
             }
