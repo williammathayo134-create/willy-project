@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+here<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -16,14 +16,47 @@
 </head>
 <body>
     <div class="login-card">
-        <h2>Student Login</h2>
-        <form action="student-dashboard.html">
-            <input type="text" placeholder="Namba ya Usajili (Registration No)" required>
-            <input type="password" placeholder="Nenosiri (Password)" required>
-            <button type="submit" class="btn">Ingia</button>
+        <h2>Student Registration</h2>
+        <!-- Form sasa inaita handleStudentRegister(event) wakati wa kusubmit -->
+        <form onsubmit="handleStudentRegister(event)">
+            <input type="text" id="fullName" placeholder="Jina Kamili" required>
+            <input type="email" id="email" placeholder="Barua Pepe (Email)" required>
+            <input type="tel" id="phone" placeholder="Namba ya Simu" required>
+            <button type="submit" class="btn">Sajili / Ingia</button>
         </form>
         <a href="index.html" class="back-link">Rudi Nyuma</a>
     </div>
+
+    <!-- 1. Maktaba ya Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+      // 2. Anzisha Supabase Client
+      const SUPABASE_URL = 'https://yeknndybcythktjhqg.supabase.co';
+      const SUPABASE_KEY = 'sb_publishable_DIRrZcp4bUVnRXmovQnksg_j74R0JWI';
+      const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      // 3. Function ya kusajili mwanafunzi mpya
+      async function handleStudentRegister(event) {
+        event.preventDefault(); // Kuzuia ukurasa kurefresh
+
+        const fullName = document.getElementById('fullName').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+
+        const { data, error } = await _supabase
+          .from('students')
+          .insert([
+            { full_name: fullName, email: email, phone: phone }
+          ]);
+
+        if (error) {
+          alert("Imeshindikana kuhifadhi: " + error.message);
+        } else {
+          alert("Mwanafunzi amesajiliwa kikamilifu!");
+          window.location.href = "student-dashboard.html"; // Mpeleke kwenye dashboard
+        }
+      }
+    </script>
 </body>
 </html>
-
