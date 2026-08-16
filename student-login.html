@@ -263,11 +263,12 @@
                         'Authorization': 'Bearer ' + SUPABASE_KEY
                     },
                     body: JSON.stringify({
-                        full_name: studentData.fullName,
-                        email: studentData.email,
-                        phone: studentData.phone
-                    })
-                });
+    full_name: studentData.fullName,
+    email: studentData.email,
+    Phone: studentData.phone,
+    reg_number: regNumber
+})
+          });
             } catch(e) {}
 
             document.getElementById('otpSection').style.display = "none";
