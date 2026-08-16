@@ -1,4 +1,4 @@
-here<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="sw">
 <head>
     <meta charset="UTF-8">
@@ -34,11 +34,17 @@ here<!DOCTYPE html>
         
         .hidden { display: none !important; }
         .logout-btn { position: absolute; right: 15px; top: 15px; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        
+        .nav-menu { margin: 25px 0 10px 0; display: flex; flex-direction: column; gap: 10px; }
+        .nav-btn { display: block; padding: 12px; color: white; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; text-align: center; }
     </style>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -50,79 +56,31 @@ here<!DOCTYPE html>
 
     <div id="auth-container" class="container">
         <h2 style="margin-top:0; color:#00274c;">Ingia Kwenye Mfumo</h2>
-        <p style="margin-bottom: 25px;">Bonyeza kitufe hapa chini kuingia kwa akaunti yako ya Google.</p>
+        <p style="margin-bottom: 20px;">Bonyeza kitufe hapa chini kuingia kwa akaunti yako ya Google au chagua ukurasa unaotaka kwenda:</p>
         
         <button class="btn-google" onclick="signInWithGoogle()">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
             Ingia kwa Google (Sign in with Google)
         </button>
-    </div>
 
-    <div id="services-container" class="container hidden">
-        <h2>Chagua Huduma</h2>
-        <a href="student-dashboard.html" class="btn">Ingia kama Mwanafunzi (Fomu na Namba ya Usajili)</a>
-        <a href="teacher-dashboard.html" class="btn">Ingia kama Mwalimu / Usajili</a>
-        <a href="ai-chat.html" style="display: block; background: #2563eb; color: white; padding: 15px; text-align: center; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 15px;">Uliza AI (swali lolote)</a>
-        <a href="chat_bot.html" style="display: block; background: #00274c; color: #ffcb05; padding: 12px; text-align: center; border-radius: 5px; text-decoration: none; font-weight: bold; margin-top: 12px;">Uliza chatbot (Kwa maswala ya chuo)</a>
+        <!-- Quick Navigation Links -->
+        <div class="nav-menu">
+            <a href="ai-chat.html" class="nav-btn" style="background: #007bff;">🤖 AI Chat</a>
+            <a href="student-dashboard.html" class="nav-btn" style="background: #28a745;">🎓 Student Dashboard</a>
+            <a href="teacher-dashboard.html" class="nav-btn" style="background: #17a2b8;">👨‍🏫 Teacher Dashboard</a>
+            <a href="student-login.html" class="nav-btn" style="background: #6c757d;">🔑 Student Login</a>
+        </div>
     </div>
 
     <script>
-        const firebaseConfig = {
-          apiKey: "AIzaSyAGs0yCE3Rh_CuRI90aAOZG9VRCOsJL2Io",
-          authDomain: "willy-project-a37da.firebaseapp.com",
-          projectId: "willy-project-a37da",
-          storageBucket: "willy-project-a37da.firebasestorage.app",
-          messagingSenderId: "671963332154",
-          appId: "1:671963332154:web:70584b9ef38625f13d3f03",
-          measurementId: "G-MZHCS9SM8H"
-        };
+      // Supabase Configuration
+      const SUPABASE_URL = 'https://hiqzywtwiyhpolycovth.supabase.co';
+      const SUPABASE_KEY = 'sb_publishable_71D7AWWjGp5r_G3Ftpxg3A_P-Pfz0jY';
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const provider = new firebase.auth.GoogleAuthProvider();
+      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      console.log("Index connected to Supabase!");
+    </script>
 
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                showServices(user);
-            } else {
-                document.getElementById('auth-container').classList.remove('hidden');
-                document.getElementById('services-container').classList.add('hidden');
-                document.getElementById('logout-btn').classList.add('hidden');
-            }
-        });
-
-        function signInWithGoogle() {
-            auth.signInWithPopup(provider)
-                .then((result) => {
-                    showServices(result.user);
-                })
-                .catch((error) => {
-                    alert("Imeshindwa kuingia: " + error.message);
-                });
-        }
-
-        function showServices(user) {
-            document.getElementById('auth-container').classList.add('hidden');
-            document.getElementById('services-container').classList.remove('hidden');
-            document.getElementById('logout-btn').classList.remove('hidden');
-            document.getElementById('header-subtitle').innerText = `Habari ${user.displayName}, karibu kwenye huduma za chuo!`;
-        }
-
-        function logoutUser() {
-            auth.signOut().then(() => {
-                location.reload();
-            });
-        }
-   <!-- Supabase SDK Library -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-  // Supabase Configuration
-  const SUPABASE_URL = 'https://hiqzywtwiyhpolycovth.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_71D7AWWjGp5r_G3Ftpxg3A_P-Pfz0jY';
-
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  console.log("Index connected to Supabase!");
-</script>
- </body>
+</body>
 </html>
+
