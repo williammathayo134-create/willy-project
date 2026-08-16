@@ -113,6 +113,16 @@ here<!DOCTYPE html>
                 location.reload();
             });
         }
-    </script>
-</body>
+   <!-- Supabase SDK Library -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  // Supabase Configuration
+  const SUPABASE_URL = 'https://hiqzywtwiyhpolycovth.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_71D7AWWjGp5r_G3Ftpxg3A_P-Pfz0jY';
+
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  console.log("Index connected to Supabase!");
+</script>
+ </body>
 </html>
