@@ -149,7 +149,7 @@
             </div>
             <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm max-w-[85%] sm:max-w-[75%] text-sm">
                 <p class="font-semibold text-brand-600 dark:text-brand-400 mb-1">Williams Auto Electric AI</p>
-                <p class="whitespace-pre-wrap">Habari mkuu William! Mfumo uko tayari. Inatumia **Hugging Face Vision** kuchambua picha na **Groq Llama 3.3** kwa ajili ya majibu ya haraka ya kiufundi ya ICoT na gari zako. Ungependa nikuvisaidie nini leo?</p>
+                <p class="whitespace-pre-wrap">karibu nikusaidie nini?</p>
                 <span class="text-[10px] text-slate-400 mt-2 block">08:00 AM</span>
             </div>
         </div>
@@ -198,7 +198,11 @@
             <label class="p-3 text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 cursor-pointer rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Pakia Picha">
                 <i class="fa-solid fa-image text-lg"></i>
                 <input type="file" id="image-input" onchange="handleImageSelected(event)" class="hidden" accept="image/*">
-            </label>
+            </label><!-- Kitufe cha Kushea Skrini (Screen Capture) -->
+<button type="button" onclick="captureScreen()" class="p-3 text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Shea Skrini Moja kwa Moja">
+  <i class="fa-solid fa-desktop text-lg"></i>
+</button>
+
 
             <!-- Eneo la Kuandika Ujumbe -->
             <div class="flex-1 bg-slate-100 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 focus-within:border-brand-500 flex items-center px-4 py-2">
@@ -873,7 +877,35 @@
                 alert("Kivinjari chako hakitumii mfumo wa sauti.");
             }
         }
-   
+   // Function ya Kuchukua Skrini (Screen Capture)
+async function captureScreen() {
+  try {
+    const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+    const track = stream.getVideoTracks()[0];
+    const imageCapture = new ImageCapture(track);
+    const bitmap = await imageCapture.grabFrame();
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    const context = canvas.getContext('2d');
+    context.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height);
+    
+    const screenDataUrl = canvas.toDataURL('image/png');
+    track.stop(); // Funga kinasa skrini baada ya kuchukua picha
+    
+    // Weka picha kwenye sehemu ya preview
+    currentAttachment = { type: 'image', url: screenDataUrl, name: 'Screen Capture' };
+    document.getElementById('preview-img-tag').src = screenDataUrl;
+    document.getElementById('preview-img-tag').classList.remove('hidden');
+    document.getElementById('preview-file-icon').classList.add('hidden');
+    document.getElementById('preview-name').innerText = 'Screen Capture';
+    document.getElementById('attachment-preview').classList.remove('hidden');
+  } catch (err) {
+    alert("Hujatoa ruhusa ya kuchukua skrini au browser yako haiafikiani nayo.");
+  }
+}
+
     </script>
 </body>
 </html>
