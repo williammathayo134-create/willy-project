@@ -823,6 +823,8 @@
             }
         }
                 // Orodha ya Lugha 5 unazozitaka na majina yao
+       
+
         const customLanguageList = [
             { code: 'sw-TZ', name: 'Kiswahili (Tanzania) - Mwanamke (30 Yrs)' },
             { code: 'sw-KE', name: 'Kiswahili (Kenya) - Mwanaume (27 Yrs)' },
@@ -854,7 +856,7 @@
         forceLoadFiveLanguages();
 
         // Function ya kuongea inayotumia Lugha uliyoichagua kutoka kwenye Lugha 5
-        function speakText(text🎙️) {
+        function speakText(text) {
             if ('speechSynthesis' in window) {
                 if (window.speechSynthesis.speaking) {
                     window.speechSynthesis.cancel();
