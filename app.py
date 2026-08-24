@@ -1,4 +1,3 @@
-import datetime
 from flask import Flask, render_template_string, request
 
 app = Flask(__name__)
@@ -7,30 +6,29 @@ HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WILLY-PROJECT SYSTEM</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WILLY-PROJECT</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f9; }
-        .card { background: white; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h2 { color: #0056b3; text-align: center; }
-        select, input, button { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; }
-        button { background: #ff6600; color: white; border: none; font-weight: bold; cursor: pointer; }
-        .receipt { background: #eef; padding: 15px; border-left: 4px solid #0056b3; font-family: monospace; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }
+        .container { max-width: 400px; background: white; padding: 20px; margin: auto; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #0056b3; }
+        input, select, button { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #0056b3; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .receipt { background: #eef; padding: 15px; border-radius: 5px; margin-top: 15px; }
     </style>
 </head>
 <body>
-    <div class="card">
+    <div class="container">
         <h2>WILLY-PROJECT</h2>
         <form method="POST">
             <label>Jina la Mteja:</label>
-            <input type="text" name="jina" required placeholder="Ingiza jina kamili">
+            <input type="text" name="jina" placeholder="Ingiza jina kamili" required>
 
             <label>Chagua Huduma:</label>
             <select name="huduma">
-                <option value="Vyeti vya Kuzaliwa">Vyeti vya Kuzaliwa - TZS 15,000</option>
-                <option value="Kutengeneza Logo">Kutengeneza Logo - TZS 30,000</option>
-                <option value="Website Development">Website Development - TZS 150,000</option>
-                <option value="Automatic Systems">Automatic Systems - TZS 100,000</option>
+                <option value="Vyeti vya Kuzaliwa">Vyeti vya Kuzaliwa</option>
+                <option value="Kutengeneza Logo">Kutengeneza Logo</option>
+                <option value="Website Development">Website Development</option>
+                <option value="Automatic Systems">Automatic Systems</option>
             </select>
 
             <button type="submit">Tengeneza Risiti</button>
@@ -39,10 +37,8 @@ HTML_TEMPLATE = """
         {% if risiti %}
         <div class="receipt">
             <h3>RISITI YA ODA</h3>
-            <p><b>Tarehe:</b> {{ risiti.tarehe }}</p>
-            <p><b>Mteja:</b> {{ risiti.jina }}</p>
-            <p><b>Huduma:</b> {{ risiti.huduma }}</p>
-            <p><b>Hali:</b> IMELIPWA (PAID)</p>
+            <p><strong>Mteja:</strong> {{ risiti.jina }}</p>
+            <p><strong>Huduma:</strong> {{ risiti.huduma }}</p>
         </div>
         {% endif %}
     </div>
@@ -51,14 +47,13 @@ HTML_TEMPLATE = """
 """
 
 @app.route('/', methods=['GET', 'POST'])
-def home():
+def index():
     risiti = None
     if request.method == 'POST':
         jina = request.form.get('jina')
         huduma = request.form.get('huduma')
-        tarehe = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        risiti = {'jina': jina, 'huduma': huduma, 'tarehe': tarehe}
+        risiti = {'jina': jina, 'huduma': huduma}
     return render_template_string(HTML_TEMPLATE, risiti=risiti)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)
